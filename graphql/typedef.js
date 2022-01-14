@@ -57,6 +57,9 @@ const LoginType = {
         },
         token: {
             type: GraphQLString,
+        },
+        id: {
+            type: GraphQLID,
         }
 
     }
