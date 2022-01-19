@@ -5,7 +5,9 @@ const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
 const { generateToken } = require("../utils/auth");
 const { validateRegisArgs } = require("../utils/validations/registVal");
+const { RecoverVldtrs, ResetVldtr } = require("../utils/validations/recoverVal");
 const { LoginType } = require("./typedef");
+
 
 const register = {
     type: GraphQLString,
@@ -18,7 +20,7 @@ const register = {
         lastName: { type: GraphQLString },
         role: { type: GraphQLString }
     },
-    async resolve (_, args) {
+    async resolve(_, args) {
 
         const validate = validateRegisArgs(args);
         if (validate.isValid == false) {
@@ -26,7 +28,7 @@ const register = {
         }
 
         const { username, password, email, firstName, lastName, role } = args;
-        
+
         const user = await User.findOne({ username });
         const emailExist = await User.findOne({ email });
         if (user || emailExist) {
@@ -57,7 +59,7 @@ const login = {
         username: { type: GraphQLString },
         password: { type: GraphQLString },
     },
-    async resolve (_, args) {
+    async resolve(_, args) {
         const { username, password } = args;
         if (!username || !password) {
             throw new Error("Please enter all arguments!");
@@ -76,5 +78,38 @@ const login = {
     }
 }
 
+const recoverPassword = {
+    type: GraphQLString,
+    description: "This mutation is used to  sends and email to the user in order to reset the password",
+    args: {
+        email: { type: GraphQLString },
+    },
+    async resolve(_, args) {
+        const { email } = args;
+        const res = await RecoverVldtrs(email)
+        if (res.isValid !== true) {
+            throw new Error(res.message);
+        }
+        return res.message;
+    }
+}
 
-module.exports = { register, login };
+const resetPassword = {
+    type: GraphQLString,
+    description: "This mutation is used to  reset user  password",
+    args: {
+        id: { type: GraphQLString },
+        password: { type: GraphQLString },
+    },
+    async resolve(_, args) {
+        const { id } = args;
+        const res = await ResetVldtr(id)
+        if (res.isValid == false) {
+            throw new Error(res.message);
+        }
+        return res.message;
+
+    }
+}
+
+module.exports = { register, login, recoverPassword, resetPassword };

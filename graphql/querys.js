@@ -1,6 +1,6 @@
-const { GraphQLList } = require("graphql");
+const { GraphQLList, GraphQLString } = require("graphql");
 const { UserType } = require("./typedef");
-const { User } = require("../models");
+const { User, Pending } = require("../models");
 
 const users = {
     type: new GraphQLList(UserType),
@@ -11,4 +11,28 @@ const users = {
     }
 }
 
-module.exports = { users };
+const PedingReq = {
+    type: GraphQLString,
+    description: "Validating a pending request for reset password",
+    args: {
+        UserId: { type: GraphQLString },
+    },
+    async resolve(_, args) {
+        const { UserId } = args;
+        if (!UserId) {
+            throw new Error("UserId is required");
+        }
+
+        const pending = await Pending.findOne({ UserId });
+        if (!pending) {
+            throw new Error("UserId is not found");
+        }
+
+        return "User found";
+
+
+    }
+}
+
+
+module.exports = { users, PedingReq };
