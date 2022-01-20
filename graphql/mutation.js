@@ -100,10 +100,11 @@ const resetPassword = {
     args: {
         id: { type: GraphQLString },
         password: { type: GraphQLString },
+        confirmPassword: { type: GraphQLString },
     },
     async resolve(_, args) {
-        const { id } = args;
-        const res = await ResetVldtr(id)
+        const { id, password, confirmPassword } = args;
+        const res = await ResetVldtr(id, password, confirmPassword)
         if (res.isValid == false) {
             throw new Error(res.message);
         }

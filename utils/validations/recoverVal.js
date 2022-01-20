@@ -1,6 +1,7 @@
 const { User } = require("../../models")
 const { Pending } = require("../../models")
 const { Mailing } = require("../mailing");
+const CryptoJS = require("crypto-js");
 
 /* Here we validate user existance and proper input, then we sent a email confirmation  */
 async function RecoverVldtrs(email) {
@@ -22,6 +23,7 @@ async function RecoverVldtrs(email) {
         const nesPending = new Pending({
             UserId: Exist._id,
             email: Exist.email,
+            name: Exist.firstName
         })
         const SavedPending = await nesPending.save()
         if (!SavedPending) {
@@ -40,22 +42,24 @@ async function RecoverVldtrs(email) {
 }
 
 
-async function ResetVldtr (id) {
+async function ResetVldtr (id, password, confirmPassword) {
 
     if (!id) {
         return { message: "Invalid id", isValid: false };
+    } else if (!password || !confirmPassword || password != confirmPassword) { 
+        return { message: "Invalid password", isValid: false };
     }
 
-    const Exist = await Pending.findOne({ id });
+    const Exist = await Pending.findOne({ UserId: id });
 
     if (!Exist) {
         return { message: "There is not Reset Password Request For this user", isValid: false };
     }
 
-    const ExistUser = await User.findOne({ _id: Exist.id });
+    const ExistUser = await User.findOne({ _id: id });
     if (!ExistUser) {
         return { message: "User not found", isValid: false };
-    }
+    } 
 
     ExistUser.password = CryptoJS.AES.encrypt(password, process.env.PASSPHRASE).toString();
     const SaverPassword = await ExistUser.save()

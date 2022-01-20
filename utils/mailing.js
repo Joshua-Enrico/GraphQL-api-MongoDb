@@ -25,7 +25,6 @@ async function Mailing (id, email, name) {
     }
 
     const res =  await tranporter.sendMail(message)
-    console.log(res)
     if (res.accepted.length == 0) {
         return { message: "Error sending email", isValid: false }
     } else {

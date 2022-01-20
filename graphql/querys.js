@@ -1,5 +1,5 @@
-const { GraphQLList, GraphQLString } = require("graphql");
-const { UserType } = require("./typedef");
+const { GraphQLList, GraphQLString, GraphQLObjectType } = require("graphql");
+const { UserType, UserExistance } = require("./typedef");
 const { User, Pending } = require("../models");
 
 const users = {
@@ -12,7 +12,7 @@ const users = {
 }
 
 const PedingReq = {
-    type: GraphQLString,
+    type: new GraphQLObjectType(UserExistance),
     description: "Validating a pending request for reset password",
     args: {
         UserId: { type: GraphQLString },
@@ -28,7 +28,7 @@ const PedingReq = {
             throw new Error("UserId is not found");
         }
 
-        return "User found";
+        return { id: pending.UserId, name: pending.name};
 
 
     }

@@ -62,12 +62,29 @@ const LoginType = {
             type: GraphQLID,
         }
 
+    },
+
+
+
+}
+
+const UserExistance = {
+    name: "UserExistance",
+    description: "This is the login type",
+    fields: {
+        name: {
+            type: GraphQLString,
+
+
+        },
+        id : {
+            type: GraphQLID,
+        }
     }
-
-
 }
 
 module.exports = {
-    UserType,
-    LoginType
-}
+        UserType,
+        LoginType,
+        UserExistance
+    }
